@@ -145,17 +145,7 @@ export default Ember.Mixin.create({
 
   createChildViewsMorph: function (element) {
     element = element.firstChild;
-
-    if (this.tagName === '') {
-      if (this._morph) {
-        this._childViewsMorph = this._morph;
-      } else {
-        element = document.createDocumentFragment();
-        this._childViewsMorph = this._dom.appendMorph(element);
-      }
-    } else {
-      this._childViewsMorph = this._renderer._dom.createMorph(element, element.lastChild, null);
-    }
+    this._childViewsMorph = this._renderer._dom.createMorph(element, element.lastChild, null);
     return element;
   },
 
