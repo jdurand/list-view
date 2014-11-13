@@ -26,8 +26,12 @@ function rerender() {
 
   context = get(this, 'context');
 
+  // releases action helpers in contents
+  // this means though that the ListItemView itself can't use classBindings or attributeBindings
+  // need support for rerender contents in ember
+  this.triggerRecursively('willClearRender');
+
   if (context) {
-    this.triggerRecursively('willClearRender');
 
     hasChildViews = this._childViews.length > 0;
 
