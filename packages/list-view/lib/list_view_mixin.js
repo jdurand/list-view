@@ -65,13 +65,6 @@ function addEmptyView() {
   this.unshiftObject(emptyView);
 }
 
-var domManager = Ember.create(Ember.ContainerView.proto().domManager);
-
-domManager.prepend = function(view, html) {
-  view.$('.ember-list-container').prepend(html);
-  notifyMutationListeners();
-};
-
 function enableProfilingOutput() {
   function before(name, time, payload) {
     console.time(name);
@@ -103,7 +96,6 @@ export default Ember.Mixin.create({
   classNames: ['ember-list-view'],
   attributeBindings: ['style'],
   classNameBindings: ['_isGrid:ember-list-view-grid:ember-list-view-list'],
-  domManager: domManager,
   scrollTop: 0,
   bottomPadding: 0, // TODO: maybe this can go away
   _lastEndingIndex: 0,
@@ -147,9 +139,24 @@ export default Ember.Mixin.create({
     @param {Ember.RenderBuffer} buffer The render buffer
   */
   render: function(buffer) {
-    buffer.push('<div class="ember-list-container">');
+    buffer.push('<div class="ember-list-container"></div>');
     this._super(buffer);
-    buffer.push('</div>');
+  },
+
+  createChildViewsMorph: function (element) {
+    element = element.firstChild;
+
+    if (this.tagName === '') {
+      if (this._morph) {
+        this._childViewsMorph = this._morph;
+      } else {
+        element = document.createDocumentFragment();
+        this._childViewsMorph = this._dom.appendMorph(element);
+      }
+    } else {
+      this._childViewsMorph = this._renderer._dom.createMorph(element, element.lastChild, null);
+    }
+    return element;
   },
 
   willInsertElement: function() {

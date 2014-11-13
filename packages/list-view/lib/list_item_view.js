@@ -4,21 +4,6 @@ import ListItemViewMixin from 'list-view/list_item_view_mixin';
 
 var get = Ember.get, set = Ember.set;
 
-function backportedInnerString(buffer) {
-  var content = [], childBuffers = buffer.childBuffers;
-
-  Ember.ArrayPolyfills.forEach.call(childBuffers, function(buffer) {
-    var stringy = typeof buffer === 'string';
-    if (stringy) {
-      content.push(buffer);
-    } else {
-      buffer.array(content);
-    }
-  });
-
-  return content.join('');
-}
-
 function willInsertElementIfNeeded(view) {
   if (view.willInsertElement) {
     view.willInsertElement();
@@ -39,31 +24,18 @@ function rerender() {
 
   context = get(this, 'context');
 
-
-  // releases action helpers in contents
-  // this means though that the ListItemView itself can't use classBindings or attributeBindings
-  // need support for rerender contents in ember
-  this.triggerRecursively('willClearRender');
-
-  if (this.lengthAfterRender > this.lengthBeforeRender) {
-    this.clearRenderedChildren();
-    this._childViews.length = this.lengthBeforeRender; // triage bug in ember
-  }
-
   if (context) {
-    buffer = Ember.RenderBuffer();
-    buffer = this.renderToBuffer(buffer);
+    this.triggerRecursively('willClearRender');
 
-    // check again for childViews, since rendering may have added some
     hasChildViews = this._childViews.length > 0;
 
     if (hasChildViews) {
       this.invokeRecursively(willInsertElementIfNeeded, false);
     }
 
-    element.innerHTML = buffer.innerString ? buffer.innerString() : backportedInnerString(buffer);
-
-    set(this, 'element', element);
+    var temp = this.constructor.create({ context: context });
+    element.innerHTML = temp.createElement().element.innerHTML;
+    temp.destroy();
 
     var transitionTo = this._transitionTo ? this._transitionTo : this.transitionTo;
 
@@ -104,6 +76,43 @@ function rerender() {
   @namespace Ember
 */
 export default Ember.View.extend(ListItemViewMixin, {
+  triggerRecursively: function(eventName) {
+    var childViews = [this], currentViews, view, currentChildViews;
+
+    while (childViews.length) {
+      currentViews = childViews.slice();
+      childViews = [];
+
+      for (var i=0, l=currentViews.length; i<l; i++) {
+        view = currentViews[i];
+        currentChildViews = view._childViews ? view._childViews.slice(0) : null;
+        if (view.trigger) { view.trigger(eventName); }
+        if (currentChildViews) {
+          childViews.push.apply(childViews, currentChildViews);
+        }
+
+      }
+    }
+  },
+
+  invokeRecursively: function(fn, includeSelf) {
+    var childViews = (includeSelf === false) ? this._childViews : [this];
+    var currentViews, view, currentChildViews;
+
+    while (childViews.length) {
+      currentViews = childViews.slice();
+      childViews = [];
+
+      for (var i=0, l=currentViews.length; i<l; i++) {
+        view = currentViews[i];
+        currentChildViews = view._childViews ? view._childViews.slice(0) : null;
+        fn(view);
+        if (currentChildViews) {
+          childViews.push.apply(childViews, currentChildViews);
+        }
+      }
+    }
+  },
   updateContext: function(newContext){
     var context = get(this, 'context');
     Ember.instrument('view.updateContext.render', this, function() {

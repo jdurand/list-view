@@ -4,7 +4,7 @@ var el = document.createElement('div'), style = el.style;
 var propPrefixes = ['Webkit', 'Moz', 'O', 'ms'];
 
 function testProp(prop) {
-  if (prop in style) return prop;
+  if (prop in style) { return prop; }
   var uppercaseProp = prop.charAt(0).toUpperCase() + prop.slice(1);
   for (var i=0; i<propPrefixes.length; i++) {
     var prefixedProp = propPrefixes[i] + uppercaseProp;

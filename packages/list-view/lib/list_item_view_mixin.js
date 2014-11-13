@@ -1,6 +1,6 @@
 // jshint validthis: true
 
-var get = Ember.get, set = Ember.set;
+var get = Ember.get;
 
 function samePosition(a, b) {
   return a && b && a.x === b.x && a.y === b.y;
@@ -19,7 +19,9 @@ function positionElement() {
     // TODO: avoid needing this by avoiding unnecessary
     // calls to this method in the first place
     if (samePosition(position, _position)) { return; }
+
     Ember.run.schedule('render', this, this._parentView.applyTransform, element, position.x, position.y);
+
     this._position = position;
   }, this);
 }
