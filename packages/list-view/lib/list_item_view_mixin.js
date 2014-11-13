@@ -14,11 +14,15 @@ function positionElement() {
     position = this.position;
     _position = this._position;
 
-    if (!position || !element) { return; }
+    if (!position || !element) {
+      return;
+    }
 
     // TODO: avoid needing this by avoiding unnecessary
     // calls to this method in the first place
-    if (samePosition(position, _position)) { return; }
+    if (samePosition(position, _position)) {
+      return;
+    }
 
     Ember.run.schedule('render', this, this._parentView.applyTransform, element, position.x, position.y);
 

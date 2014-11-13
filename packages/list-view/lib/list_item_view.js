@@ -20,7 +20,9 @@ function rerender() {
   var element, buffer, context, hasChildViews;
   element = get(this, 'element');
 
-  if (!element) { return; }
+  if (!element) {
+    return;
+  }
 
   context = get(this, 'context');
 

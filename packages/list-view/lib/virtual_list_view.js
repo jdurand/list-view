@@ -52,7 +52,9 @@ export default Ember.ContainerView.extend(ListViewMixin, VirtualListScrollerEven
       // Support old and new Ember versions
       var state = view._state || view.state;
 
-      if (state !== 'inDOM') { return; }
+      if (state !== 'inDOM') {
+        return;
+      }
 
       if (view.listContainerElement) {
         view._scrollerTop = top;
@@ -70,7 +72,10 @@ export default Ember.ContainerView.extend(ListViewMixin, VirtualListScrollerEven
     updateScrollerDimensions(view);
   },
   setupPullToRefresh: function() {
-    if (!this.pullToRefreshViewClass) { return; }
+    if (!this.pullToRefreshViewClass) {
+      return;
+    }
+    
     this._insertPullToRefreshView();
     this._activateScrollerPullToRefresh();
   },

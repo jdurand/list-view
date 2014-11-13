@@ -883,7 +883,9 @@ export default Ember.Mixin.create({
   },
 
   destroy: function () {
-    if (!this._super()) { return; }
+    if (!this._super()) {
+      return;
+    }
 
     if (this._createdEmptyView) {
       this._createdEmptyView.destroy();
